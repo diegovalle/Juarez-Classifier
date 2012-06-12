@@ -48,3 +48,7 @@ tbl <- subset(tbl, PRESUNTOtxt == "Homicide")
 sum(tbl$V1.y)
 names(tbl) <- c("Year", "Injury Intent", "Original Deaths", "Imputed Deaths")
 print(xtable(tbl, digits = 0), include.colnames = TRUE)
+
+xtable(data.frame(Total = 'Total 2008-2010',
+                  "Original Deaths" = sum(tbl$V1.x[5:7]),
+                  "Imputed Deaths" = sum(tbl$V1.y[5:7])))

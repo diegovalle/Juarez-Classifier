@@ -1,8 +1,9 @@
 
 
 
-##Only use Age, Cause of Injury, Sex and place where
-##the injury took place to classify the presumed Accidents, Homicides, etc
+##Only use Age, Cause of Injury, Sex, place where
+##the injury took place and Year of death
+##to classify the presumed Accidents, Homicides, etc
 y <- c("PRESUNTOtxt")
 x <- c("EDADVALOR","CAUSE", "SEXOtxt", "LUGLEStxt", "ANIODEF")
 
@@ -47,10 +48,10 @@ if ( require("multicore", quietly = TRUE, warn.conflicts = FALSE) ) {
 #Random Forest
 if(file.exists("cache/rf.RData")) {
   message("#############################")
+  message("Loading cached data for the random forest classifier")
+  message("delete cache directory if you don't want this to happen")
   message("#############################")
-   message("Loading cached data for the random forest classifier")
-   message("delete cache directory if you don't want this to happen")
-   load(file = "cache/rf.RData")
+  load(file = "cache/rf.RData")
 } else {
   message("#############################")
   message("#############################")
@@ -73,10 +74,10 @@ print(confusionMatrix(fit.pred.rf, test$PRESUNTOtxt))
 #Elastic Net
 if(file.exists("cache/glmnet.RData")) {
   message("#############################")
-  message("#############################")
   message("Loading cached data for the penalized regression classifier")
   message("delete cache directory if you don't want this to happen")
-   load(file = "cache/glmnet.RData")
+  message("#############################")
+  load(file = "cache/glmnet.RData")
 } else {
   message("#############################")
   message("#############################")
@@ -98,10 +99,10 @@ print(confusionMatrix(fit.pred.glmnet, test$PRESUNTOtxt))
 #Support Vector Machine
 if(file.exists("cache/svm.RData")) {
   message("#############################")
-  message("#############################")
   message("Loading cached data for the svm classifier")
   message("delete cache directory if you don't want this to happen")
-   load(file = "cache/svm.RData")
+  message("#############################")
+  load(file = "cache/svm.RData")
 } else {
   message("#############################")
   message("#############################")
@@ -121,9 +122,13 @@ fit.pred.svm <- predict(svmFit, test)
 print(confusionMatrix(fit.pred.svm, na.omit(test)$PRESUNTOtxt))
 
 #Determine which was the best model
-resamps <- resamples(list(svm = svmFit, rf = rfFit, glmnet = glmnetFit))
+resamps <- resamples(list('Support Vector Machine' = svmFit,
+                          'Random Forest' = rfFit,
+                          'Penalized Regression' = glmnetFit))
 summary(resamps)
-bwplot(resamps, metric = "Accuracy")
+png("graphs/accuracy.png", width = 600, height = 540)
+print(bwplot(resamps, metric = "Accuracy"))
+dev.off()
 dotplot(resamps, metric = "Accuracy")
 densityplot(resamps, metric = "Accuracy")
 
